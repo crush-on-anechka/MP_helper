@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="mx-4">
+
+        <form action="/update_stats" method="post">
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">update stats</button>
+        </form>
+        <form action="/load_stats" method="post">
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">load stats</button>
+        </form>
+
+        <form action="/update_cookies" method="post">
+            put your request as curl here:<br>
+            <input class="bg-blue-100" name="curl" />
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >update cookies</button>
+        </form>
+
+        <form action="/analyze" method="post">
+            put your selection link here:<br>
+            <input class="bg-blue-100" name="url" />
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >analyze</button>
+        </form>
+
+        <div class="mx-4">
+            {{ message }}
+        </div>
+
+        {% if context %}
+        <table class="min-w-[50%] mb-4">
+            <thead class="border-b text-lg">
+                <tr>
+                    <th class="border">Group ID</th>
+                    <th class="border">Group name</th>
+                    <th class="border">Cost</th>
+                    <th class="border">Cost prev</th>
+                    <th class="border">Click/rub</th>
+                    <th class="border">Clicks</th>
+                    <th class="border">Date</th>
+                    <th class="border">New follows</th>
+                    <th class="border">Post name</th>
+                </tr>
+            </thead>
+            <tbody class="text-center text-sm">
+                {% for group_id, group_data in context.items() %}
+                <tr>
+                    <td class="border">{{ group_id }}</td>
+                    <td class="border">{{ group_data.group_name[:20] }}</td>
+                    <td class="border">{{ group_data.cost }}</td>
+                    {% for item in group_data['data'] %}
+                    <tr>
+                        <td class="border"></td>
+                        <td class="border"></td>
+                        <td class="border"></td>
+                        <td class="border">{{ item[1].cost_prev }}</td>
+                        <td class="border">{{ item[1].click_rub }}</td>
+                        <td class="border">{{ item[1].clicks }}</td>
+                        <td class="border">{{ item[1].date }}</td>
+                        <td class="border">{{ item[1].new_follows }}</td>
+                        <td class="border">{{ item[1].post_name[:20] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% for id, data in active.items() %}
+                <tr>
+                    <td class="border">{{ id }}</td>
+                    <td class="border">{{ data[0][:20] }}</td>
+                    <td class="border"></td>
+                    <td class="border">active</td>
+                    <td class="border"></td>
+                    <td class="border"></td>
+                    <td class="border">{{ data[1] }}</td>
+                </tr>
+                {% endfor %}
+                {% for item in no_data %}
+                <tr>
+                    <td class="border">{{ item[0] }}</td>
+                    <td class="border">{{ item[1][:20] }}</td>
+                    <td class="border"></td>
+                    <td class="border">no data</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>
