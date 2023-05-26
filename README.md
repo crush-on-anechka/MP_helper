@@ -1,6 +1,6 @@
 # MP_helper
 
-MP_helper is designed and created for my personal use, it helps me to run ads for my workshop via 'market platform' by VK.com by parsing data from VK, storing, processing and delivering it and thereby providing better performance of my ads.  
+MP_helper is designed and created for my personal use, it helps me run ads for my workshop via VK.com's market platform by parsing, storing, processing and delivering data and thereby providing better performance of my ads.  
 
 ## stack
 - [FastApi]  
