@@ -1,12 +1,14 @@
 import heapq
 import re
 from collections import OrderedDict
+from typing import Optional
 
+from fastapi import Request
 from sqlalchemy.orm import Session
 
 from db import ActiveModel, GroupModel, StatsModel
 from schemas import GroupSchema
-from settings import MAX_PLACEMENTS
+from settings import MAX_PLACEMENTS, templates
 
 
 def get_group_instances(groups: dict) -> list[GroupModel]:
@@ -27,14 +29,11 @@ def write_to_db(db: Session, stats: list[StatsModel], groups: list[GroupModel],
 
 
 def extract_cookies(pattern: str, curl: str) -> str:
-    try:
-        match = re.search(pattern, curl)[0]
-        anchors = ['remixsid=', 'remixnsid=', 'hash=']
-        for item in anchors:
-            match = match.replace(item, '')
-        return match
-    except TypeError:
-        raise
+    match = re.search(pattern, curl)[0]
+    anchors = ['remixsid=', 'remixnsid=', 'hash=']
+    for item in anchors:
+        match = match.replace(item, '')
+    return match
 
 
 def serialize_stats(db: Session, selection: dict) -> OrderedDict:
@@ -42,7 +41,8 @@ def serialize_stats(db: Session, selection: dict) -> OrderedDict:
         StatsModel.group_id).where(StatsModel.group_id.in_(selection.keys()))
 
     context = OrderedDict()
-    for stats, group in data:
+    for i, content in enumerate(data):
+        stats, group = content
         if stats.group_id not in context:
             heap = []
             heapq.heapify(heap)
@@ -53,12 +53,12 @@ def serialize_stats(db: Session, selection: dict) -> OrderedDict:
             }
 
         click_rub = stats.cost // stats.clicks if stats.clicks else stats.cost
-        item = (stats.date, {'click_rub': click_rub,
-                             'date': stats.date.strftime('%d %B %y'),
-                             'post_name': stats.post_name,
-                             'cost_prev': stats.cost,
-                             'new_follows': stats.new_follows,
-                             'clicks': stats.clicks})
+        item = (stats.date, i, {'click_rub': click_rub,
+                                'date': stats.date.strftime('%d %B %y'),
+                                'post_name': stats.post_name,
+                                'cost_prev': stats.cost,
+                                'new_follows': stats.new_follows,
+                                'clicks': stats.clicks})
 
         heapq.heappush(context[stats.group_id]['data'], item)
         if len(context[stats.group_id]['data']) > MAX_PLACEMENTS:
@@ -80,3 +80,14 @@ def serialize_active(db: Session, selection: dict) -> OrderedDict:
             group.name, active.date.strftime('%d %B %y'))
 
     return active_items
+
+
+def render_template(request: Request,
+                    message: Optional[str] = '',
+                    context: Optional[dict] = None,
+                    no_data: Optional[list] = None,
+                    active: Optional[OrderedDict] = None) -> None:
+    return templates.TemplateResponse(
+        'index.html',
+        {'request': request, 'context': context, 'no_data': no_data,
+         'active': active, 'message': message})

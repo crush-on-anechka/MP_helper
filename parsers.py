@@ -66,12 +66,16 @@ def get_stats(db: Session, start_date: date,
 
 def get_selection(db: Session, request_url: str) -> dict:
     data = {'al': '1'}
-    for param in request_url.split('&')[1:]:
-        key, val = param.split('=')
-        data[key] = val.replace('%2C', ',')
 
-    params = {'act': 'community_search'}
-    params['ad_id'] = data.pop('ad_id')
+    try:
+        for param in request_url.split('&')[1:]:
+            key, val = param.split('=')
+            data[key] = val.replace('%2C', ',')
+
+        params = {'act': 'community_search'}
+        params['ad_id'] = data.pop('ad_id')
+    except (ValueError, KeyError):
+        raise
 
     cookies, _ = get_cookies(db)
 
