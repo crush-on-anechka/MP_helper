@@ -35,11 +35,14 @@
                 <tr>
                     <th class="border">Group ID</th>
                     <th class="border">Group name</th>
+                    <th class="border">Reach</th>
                     <th class="border">Cost</th>
                     <th class="border">Cost prev</th>
-                    <th class="border">Click/rub</th>
+                    <th class="border">Rub/Click</th>
                     <th class="border">Clicks</th>
                     <th class="border">Date</th>
+                    <th class="border">Reach</th>
+                    <th class="border">Reach coeff</th>
                     <th class="border">New follows</th>
                     <th class="border">Post name</th>
                 </tr>
@@ -49,39 +52,31 @@
                 <tr>
                     <td class="border">{{ group_id }}</td>
                     <td class="border">{{ group_data.group_name[:20] }}</td>
+                    <td class="border">{{ group_data.reach }}</td>
                     <td class="border">{{ group_data.cost }}</td>
-                    {% for item in group_data['data'] %}
-                    <tr>
-                        <td class="border"></td>
-                        <td class="border"></td>
-                        <td class="border"></td>
-                        <td class="border">{{ item[2].cost_prev }}</td>
-                        <td class="border">{{ item[2].click_rub }}</td>
-                        <td class="border">{{ item[2].clicks }}</td>
-                        <td class="border">{{ item[2].date }}</td>
-                        <td class="border">{{ item[2].new_follows }}</td>
-                        <td class="border">{{ item[2].post_name[:20] }}</td>
-                    </tr>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-                {% for id, data in active.items() %}
-                <tr>
-                    <td class="border">{{ id }}</td>
-                    <td class="border">{{ data[0][:20] }}</td>
-                    <td class="border"></td>
-                    <td class="border">active</td>
-                    <td class="border"></td>
-                    <td class="border"></td>
-                    <td class="border">{{ data[1] }}</td>
-                </tr>
-                {% endfor %}
-                {% for item in no_data %}
-                <tr>
-                    <td class="border">{{ item[0] }}</td>
-                    <td class="border">{{ item[1][:20] }}</td>
-                    <td class="border"></td>
-                    <td class="border">no data</td>
+                    {% if group_id in active %}
+                        <td class="border">active now</td>
+                    {% endif %}
+                    {% if group_data['data'] is none %}
+                        <td class="border">no data</td>
+                    {% else %}
+                        {% for item in group_data['data'] %}
+                        <tr>
+                            <td class="border"></td>
+                            <td class="border"></td>
+                            <td class="border"></td>
+                            <td class="border"></td>
+                            <td class="border">{{ item.cost_prev }}</td>
+                            <td class="border">{{ item.click_rub }}</td>
+                            <td class="border">{{ item.clicks }}</td>
+                            <td class="border">{{ item.date }}</td>
+                            <td class="border">{{ item.reach }}</td>
+                            <td class="border">{{ item.reach_rub }}</td>
+                            <td class="border">{{ item.new_follows }}</td>
+                            <td class="border">{{ item.post_name[:20] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

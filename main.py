@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from db import ActiveModel, Cookies, StatsModel, get_db
 from parsers import get_active, get_selection, get_stats
 from settings import START_YEAR, STATUSES
-from utils import (extract_cookies, get_group_instances, render_template,
-                   serialize_active, serialize_stats, write_to_db)
+from utils import (extract_cookies, get_context, get_group_instances,
+                   render_template, write_to_db)
 
 app = FastAPI()
 
@@ -89,14 +89,25 @@ def analyze_handler(request: Request, url: Optional[str] = Form(None),
         message = 'oops.. did you forget to update cookies?'
         return render_template(request=request, message=message)
 
-    context = serialize_stats(db, selection)
-    active_items = serialize_active(db, selection)
+    context = get_context(db, selection)
 
-    no_data = [(k, v[0]) for k, v in selection.items()
-               if k not in context and k not in active_items]
+    active_data = db.query(ActiveModel).where(
+        ActiveModel.group_id.in_(selection.keys()))
+    active_items = [item.group_id for item in active_data]
 
-    return render_template(request=request, context=context,
-                           no_data=no_data, active=active_items)
+    for group_idx, data in selection.items():
+        if group_idx not in context:
+            context[group_idx] = {
+                'group_name': data[0],
+                'cost': data[1],
+                'reach': f'{data[2] // 1000} / {data[3] // 1000}',
+                'data': None,
+            }
+
+    context = dict(sorted(context.items()))
+
+    return render_template(
+        request=request, context=context, active=active_items)
 
 
 @app.post('/update_cookies')

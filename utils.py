@@ -1,6 +1,4 @@
-import heapq
 import re
-from collections import OrderedDict
 from typing import Optional
 
 from fastapi import Request
@@ -36,58 +34,45 @@ def extract_cookies(pattern: str, curl: str) -> str:
     return match
 
 
-def serialize_stats(db: Session, selection: dict) -> OrderedDict:
+def get_context(db: Session, selection: dict) -> dict:
     data = db.query(StatsModel, GroupModel).join(GroupModel).order_by(
-        StatsModel.group_id).where(StatsModel.group_id.in_(selection.keys()))
+        StatsModel.group_id).order_by(StatsModel.date.desc()).where(
+            StatsModel.group_id.in_(selection.keys()))
 
-    context = OrderedDict()
-    for i, content in enumerate(data):
-        stats, group = content
+    context = {}
+    for stats, group in data:
         if stats.group_id not in context:
-            heap = []
-            heapq.heapify(heap)
             context[stats.group_id] = {
                 'group_name': group.name,
                 'cost': selection[stats.group_id][1],
-                'data': heap,
+                'reach': f'{selection[stats.group_id][2] // 1000} / '
+                         f'{selection[stats.group_id][3] // 1000}',
+                'data': [],
             }
 
-        click_rub = stats.cost // stats.clicks if stats.clicks else stats.cost
-        item = (stats.date, i, {'click_rub': click_rub,
-                                'date': stats.date.strftime('%d %B %y'),
-                                'post_name': stats.post_name,
-                                'cost_prev': stats.cost,
-                                'new_follows': stats.new_follows,
-                                'clicks': stats.clicks})
+        if len(context[stats.group_id]['data']) < MAX_PLACEMENTS:
+            cl_rub = stats.cost // stats.clicks if stats.clicks else stats.cost
+            reach_rub = (stats.cost * 1000 // stats.reach_all
+                         if stats.reach_all else stats.cost)
+            item = {'click_rub': cl_rub,
+                    'date': stats.date.strftime('%d %B %y'),
+                    'post_name': stats.post_name,
+                    'cost_prev': stats.cost,
+                    'new_follows': stats.new_follows,
+                    'clicks': stats.clicks,
+                    'reach': stats.reach_all,
+                    'reach_rub': reach_rub}
 
-        heapq.heappush(context[stats.group_id]['data'], item)
-        if len(context[stats.group_id]['data']) > MAX_PLACEMENTS:
-            heapq.heappop(context[stats.group_id]['data'])
-
-    for i in context.values():
-        i['data'].sort()
+            context[stats.group_id]['data'].append(item)
 
     return context
-
-
-def serialize_active(db: Session, selection: dict) -> OrderedDict:
-    active_data = db.query(ActiveModel, GroupModel).join(GroupModel).order_by(
-        ActiveModel.group_id).where(ActiveModel.group_id.in_(selection.keys()))
-
-    active_items = OrderedDict()
-    for active, group in active_data:
-        active_items[active.group_id] = (
-            group.name, active.date.strftime('%d %B %y'))
-
-    return active_items
 
 
 def render_template(request: Request,
                     message: Optional[str] = '',
                     context: Optional[dict] = None,
-                    no_data: Optional[list] = None,
-                    active: Optional[OrderedDict] = None) -> None:
+                    active: Optional[dict] = None) -> None:
     return templates.TemplateResponse(
         'index.html',
-        {'request': request, 'context': context, 'no_data': no_data,
+        {'request': request, 'context': context,
          'active': active, 'message': message})
