@@ -4,8 +4,8 @@ from typing import Optional
 from fastapi import Request
 from sqlalchemy.orm import Session
 
-from db import ActiveModel, GroupModel, StatsModel
-from schemas import GroupSchema
+from db.models import ActiveModel, GroupModel, StatsModel
+from db.schemas import GroupSchema
 from settings import MAX_PLACEMENTS, templates
 
 

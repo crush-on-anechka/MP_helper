@@ -1,13 +1,13 @@
 from datetime import date
 from typing import Optional
 
+from db.models import ActiveModel, Cookies, StatsModel
+from db.session import get_db
 from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
-from sqlalchemy.orm import Session
-
-from db import ActiveModel, Cookies, StatsModel, get_db
 from parsers import get_active, get_selection, get_stats
 from settings import START_YEAR, STATUSES
+from sqlalchemy.orm import Session
 from utils import (extract_cookies, get_context, get_group_instances,
                    render_template, write_to_db)
 

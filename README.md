@@ -22,9 +22,11 @@ MP_helper is designed and created for my personal use, it helps me run ads for m
 
 ## starting
 - make sure your docker is up  
-- go to the project folder in terminal and run:  
+- from the root folder in terminal run:  
         - `docker-compose up -d` to set up the database  
+- from the 'app/db' folder run:  
         - `alembic upgrade heads` to set up database tables  
+- from the 'app' folder run:  
         - `uvicorn main:app --reload` and you are ready to go!  
 
 ## using

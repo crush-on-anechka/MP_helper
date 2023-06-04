@@ -5,8 +5,8 @@ from typing import Optional
 import requests
 from sqlalchemy.orm import Session
 
-from db import ActiveModel, Cookies, StatsModel
-from schemas import ActiveSchema, StatsSchema
+from db.models import ActiveModel, Cookies, StatsModel
+from db.schemas import ActiveSchema, StatsSchema
 from settings import HEADERS, PARAMS, STATUSES, URL, data
 
 
