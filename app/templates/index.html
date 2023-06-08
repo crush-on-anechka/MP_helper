@@ -13,7 +13,13 @@
             <button class="px-3 py-1 bg-blue-500 text-white ml-4">load stats</button>
         </form>
         <form action="/pending" method="get">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">pending total</button>
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">show pending total</button>
+        </form>
+
+        <form action="/performance" method="post">
+            enter start date in 'ddmmyy' format:<br>
+            <input class="bg-blue-100" name="start" />
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >show performance</button>
         </form>
 
         <form action="/update_cookies" method="post">
@@ -98,6 +104,36 @@
                 <tr>
                     <td class="border">{{ date }}</td>
                     <td class="border">{{ cost }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if performance %}
+        <table class="min-w-[50%] mb-4">
+            <thead class="border-b text-lg">
+                <tr>
+                    <th class="border">Post name</th>
+                    <th class="border">Spent Rub</th>
+                    <th class="border">Clicks</th>
+                    <th class="border">Reach</th>
+                    <th class="border">Rub/Click</th>
+                    <th class="border">Reach coeff</th>
+                </tr>
+            </thead>
+            <tbody class="text-center text-sm">
+                {% for item in performance %}
+                <tr>
+                    <td class="border">{{ item.post_name }}</td>
+                    <td class="border">{{ item.cost }}</td>
+                    <td class="border">{{ item.clicks }}</td>
+                    <td class="border">{{ item.reach }}</td>
+                    {% if item.clicks %}
+                        <td class="border">{{ item.cost // item.clicks }}</td>
+                    {% else %}
+                        <td class="border">{{ item.cost }}</td>
+                    {% endif %}
+                    <td class="border">{{ item.cost * 1000 // item.reach }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

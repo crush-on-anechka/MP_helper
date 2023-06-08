@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from db.models import ActiveModel, Cookies, StatsModel
@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from parsers import get_active, get_selection, get_stats
 from settings import START_YEAR, STATUSES
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 from utils import (extract_cookies, get_context, get_group_instances,
                    render_template, write_to_db)
 
@@ -16,7 +17,7 @@ app = FastAPI()
 
 @app.get('/', response_class=HTMLResponse)
 def index(request: Request):
-    return render_template(request=request, context={})
+    return render_template(request=request)
 
 
 @app.post('/update_stats')
@@ -81,7 +82,7 @@ def analyze_handler(request: Request, url: Optional[str] = Form(None),
 
     try:
         selection = get_selection(db, url)
-    except (ValueError, KeyError):
+    except (KeyError, ValueError):
         message = 'task failed: check url'
         return render_template(request=request, message=message)
 
@@ -149,11 +150,38 @@ def pending_total_handler(request: Request, db: Session = Depends(get_db)):
     pending = {}
 
     for item in active_instances:
-        pending[item.date] = pending.get(item.date, 0) + item.cost
+        dt = item.date.strftime('%d %B %y')
+        pending[dt] = pending.get(dt, 0) + item.cost
 
     for item in pending_instances:
-        pending[item.date] = pending.get(item.date, 0) + item.cost
+        dt = item.date.strftime('%d %B %y')
+        pending[dt] = pending.get(dt, 0) + item.cost
 
     pending = dict(sorted(pending.items()))
 
     return render_template(request=request, pending=pending)
+
+
+@app.post('/performance')
+def performance_handler(request: Request, start: str = Form(None),
+                        db: Session = Depends(get_db)):
+
+    try:
+        dt = datetime.strptime(start, "%d%m%y").strftime('%d %B %y')
+    except (TypeError, ValueError):
+        message = 'task failed, check date format'
+        return render_template(request=request, message=message)
+
+    today = date.today().strftime('%d %B %y')
+
+    message = f'performance data for {dt} - {today}'
+
+    performance = db.query(
+        StatsModel.post_name,
+        func.sum(StatsModel.clicks).label('clicks'),
+        func.sum(StatsModel.cost).label('cost'),
+        func.sum(StatsModel.reach_all).label('reach')
+        ).where(StatsModel.date > dt).group_by(StatsModel.post_name)
+
+    return render_template(request=request, message=message,
+                           performance=performance)
