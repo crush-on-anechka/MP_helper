@@ -71,8 +71,9 @@ def get_context(db: Session, selection: dict) -> dict:
 def render_template(request: Request,
                     message: Optional[str] = '',
                     context: Optional[dict] = None,
+                    pending: Optional[dict] = None,
                     active: Optional[dict] = None) -> None:
     return templates.TemplateResponse(
         'index.html',
-        {'request': request, 'context': context,
+        {'request': request, 'context': context, 'pending': pending,
          'active': active, 'message': message})

@@ -33,3 +33,4 @@ class StatsSchema(ModifiedModel):
 class ActiveSchema(ModifiedModel):
     date: date
     group_id: int
+    cost: int

@@ -12,6 +12,9 @@
         <form action="/load_stats" method="post">
             <button class="px-3 py-1 bg-blue-500 text-white ml-4">load stats</button>
         </form>
+        <form action="/pending" method="get">
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">pending total</button>
+        </form>
 
         <form action="/update_cookies" method="post">
             put your request as curl here:<br>
@@ -77,6 +80,24 @@
                         </tr>
                         {% endfor %}
                     {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if pending %}
+        <table class="min-w-[50%] mb-4">
+            <thead class="border-b text-lg">
+                <tr>
+                    <th class="border">Date</th>
+                    <th class="border">Total Rub</th>
+                </tr>
+            </thead>
+            <tbody class="text-center text-sm">
+                {% for date, cost in pending.items() %}
+                <tr>
+                    <td class="border">{{ date }}</td>
+                    <td class="border">{{ cost }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

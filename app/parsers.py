@@ -130,6 +130,8 @@ def get_active(db: Session, status: str) -> (list[ActiveModel], dict):
     group_name = [i[15:i.find('<\/a>')] for i in re.findall(
         r'"group_link\\" >.{,50}', response)]
 
+    prices = extract_digits(r'Цена:.{,200}<\\/b> руб.', response)
+
     if status == STATUSES['active']:
         group_idx, post_date = handle_active(response)
     elif status == STATUSES['pending']:
@@ -137,13 +139,14 @@ def get_active(db: Session, status: str) -> (list[ActiveModel], dict):
 
     objects, groups = [], {}
 
-    for i, n, pd in zip(group_idx, group_name, post_date):
+    for i, n, pd, pr in zip(group_idx, group_name, post_date, prices):
 
         groups[i] = n
 
         cur_obj = {
             'date': pd,
             'group_id': i,
+            'cost': pr,
         }
 
         obj = ActiveSchema(**cur_obj)

@@ -139,3 +139,21 @@ def update_cookies_handler(request: Request, curl: str = Form(None),
 
     message = 'cookies are up to date'
     return render_template(request=request, message=message)
+
+
+@app.get('/pending', response_class=HTMLResponse)
+def pending_total_handler(request: Request, db: Session = Depends(get_db)):
+    active_instances, _ = get_active(db, STATUSES['active'])
+    pending_instances, _ = get_active(db, STATUSES['pending'])
+
+    pending = {}
+
+    for item in active_instances:
+        pending[item.date] = pending.get(item.date, 0) + item.cost
+
+    for item in pending_instances:
+        pending[item.date] = pending.get(item.date, 0) + item.cost
+
+    pending = dict(sorted(pending.items()))
+
+    return render_template(request=request, pending=pending)

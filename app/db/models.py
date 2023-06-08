@@ -44,3 +44,4 @@ class ActiveModel(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     date = Column(Date)
     group_id = Column(ForeignKey('groups.id', ondelete='CASCADE'), index=True)
+    cost = Column(Integer)
