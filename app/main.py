@@ -149,11 +149,7 @@ def pending_total_handler(request: Request, db: Session = Depends(get_db)):
 
     pending = {}
 
-    for item in active_instances:
-        dt = item.date.strftime('%d %B %y')
-        pending[dt] = pending.get(dt, 0) + item.cost
-
-    for item in pending_instances:
+    for item in active_instances + pending_instances:
         dt = item.date.strftime('%d %B %y')
         pending[dt] = pending.get(dt, 0) + item.cost
 
