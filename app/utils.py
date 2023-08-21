@@ -1,12 +1,11 @@
 import re
 from typing import Optional
 
-from fastapi import Request
-from sqlalchemy.orm import Session
-
 from db.models import ActiveModel, GroupModel, StatsModel
 from db.schemas import GroupSchema
+from fastapi import Request
 from settings import MAX_PLACEMENTS, templates
+from sqlalchemy.orm import Session
 
 
 def get_group_instances(groups: dict) -> list[GroupModel]:

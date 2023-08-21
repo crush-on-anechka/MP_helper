@@ -3,11 +3,10 @@ from datetime import date, timedelta
 from typing import Optional
 
 import requests
-from sqlalchemy.orm import Session
-
 from db.models import ActiveModel, Cookies, StatsModel
 from db.schemas import ActiveSchema, StatsSchema
 from settings import HEADERS, PARAMS, STATUSES, URL, data
+from sqlalchemy.orm import Session
 
 
 def get_stats(db: Session, start_date: date,
@@ -168,10 +167,8 @@ def handle_active(response: str) -> (list[int], list[date]):
     post_date = []
 
     for sub in re.findall(re_patterns['post_date_active'], response):
-        if 'сегодня' in sub:
-            post_date.append(date.today())
-        elif 'вчера' in sub:
-            post_date.append(date.today() - timedelta(days=1))
+        yt = 'вчера' in sub
+        post_date.append(date.today() - timedelta(days=yt))
 
     return group_idx, post_date
 
@@ -187,10 +184,10 @@ def handle_pending(response: str) -> (list[int], list[date]):
     post_date = []
 
     for sub in re.findall(re_patterns['post_date_pending'], response):
-        if 'сегодня' in sub:
-            post_date.append(date.today())
-        elif 'завтра' in sub:
-            post_date.append(date.today() + timedelta(days=1))
+        td, tm, yt = 'сегодня' in sub, 'завтра' in sub, 'вчера' in sub
+        if td or tm or yt:
+            post_date.append(
+                date.today() + timedelta(days=tm) - timedelta(days=yt))
         else:
             d, m, y = re.search(r'\d{1,2} \D{3} \d{4}', sub)[0].split()
             post_date.append(date(int(y), convert_month(m), int(d)))

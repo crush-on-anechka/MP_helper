@@ -6,7 +6,7 @@ from db.session import get_db
 from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from parsers import get_active, get_selection, get_stats
-from settings import START_YEAR, STATUSES
+from settings import MESSAGES, START_YEAR, STATUSES
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from utils import (extract_cookies, get_context, get_group_instances,
@@ -28,12 +28,12 @@ def update_stats_handler(request: Request, db: Session = Depends(get_db)):
     try:
         stats_instances, groups = get_stats(db=db, start_date=last_date)
     except UnicodeEncodeError:
-        message = 'load stats failed: did you forget to load initial data?'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_init'])
 
     if not stats_instances:
-        message = 'load stats failed: did you forget to update cookies?'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_cookies'])
 
     active_instances, active_groups = get_active(db, STATUSES['active'])
     pending_instances, pending_groups = get_active(db, STATUSES['pending'])
@@ -47,8 +47,8 @@ def update_stats_handler(request: Request, db: Session = Depends(get_db)):
     write_to_db(db=db, stats=stats_instances, groups=group_instances,
                 active=active_instances + pending_instances)
 
-    message = 'stats are up to date'
-    return render_template(request=request, message=message)
+    return render_template(
+        request=request, message=MESSAGES['success_stats_update'])
 
 
 @app.post('/load_stats')
@@ -61,15 +61,17 @@ def load_stats_handler(request: Request, db: Session = Depends(get_db)):
         end_date = f'{year + 2}0101'
         cur_stats, cur_groups = get_stats(db, start_date, end_date)
         if not cur_stats:
-            message = 'load stats failed: did you forget to update cookies?'
-            return render_template(request=request, message=message)
+            return render_template(
+                request=request, message=MESSAGES['failed_cookies'])
         stats_instances.extend(cur_stats)
         groups.update(cur_groups)
 
     group_instances = get_group_instances(groups)
+    db.query(StatsModel).delete()
     write_to_db(db=db, stats=stats_instances, groups=group_instances)
 
-    return render_template(request=request, message='stats loaded')
+    return render_template(
+        request=request, message=MESSAGES['success_stats_load'])
 
 
 @app.post('/analyze', response_class=HTMLResponse)
@@ -77,18 +79,18 @@ def analyze_handler(request: Request, url: Optional[str] = Form(None),
                     db: Session = Depends(get_db)):
 
     if not url:
-        message = 'task failed: enter url'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_no_url'])
 
     try:
         selection = get_selection(db, url)
     except (KeyError, ValueError):
-        message = 'task failed: check url'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_invalid_url'])
 
     if not selection:
-        message = 'oops.. did you forget to update cookies?'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_cookies'])
 
     context = get_context(db, selection)
 
@@ -116,8 +118,8 @@ def update_cookies_handler(request: Request, curl: str = Form(None),
                            db: Session = Depends(get_db)):
 
     if not curl:
-        message = 'task failed: enter curl'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_no_curl'])
 
     re_patterns = {
         'remixsid': r'remixsid=[^;]+',
@@ -130,16 +132,16 @@ def update_cookies_handler(request: Request, curl: str = Form(None),
         remixnsid = extract_cookies(re_patterns['remixnsid'], curl)
         curl_hash = extract_cookies(re_patterns['hash'], curl)
     except TypeError:
-        message = 'task failed, check curl'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_invalid_curl'])
 
     db.query(Cookies).delete()
     cookies = Cookies(remixsid=remixsid, remixnsid=remixnsid, hash=curl_hash)
     db.add(cookies)
     db.commit()
 
-    message = 'cookies are up to date'
-    return render_template(request=request, message=message)
+    return render_template(
+        request=request, message=MESSAGES['success_cookies'])
 
 
 @app.get('/pending', response_class=HTMLResponse)
@@ -165,8 +167,8 @@ def performance_handler(request: Request, start: str = Form(None),
     try:
         dt = datetime.strptime(start, "%d%m%y").strftime('%d %B %y')
     except (TypeError, ValueError):
-        message = 'task failed, check date format'
-        return render_template(request=request, message=message)
+        return render_template(
+            request=request, message=MESSAGES['failed_date'])
 
     today = date.today().strftime('%d %B %y')
 

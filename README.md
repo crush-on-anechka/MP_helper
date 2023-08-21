@@ -1,11 +1,14 @@
 # MP_helper
 
-MP_helper is designed and created for my personal use, it helps me run ads for my workshop via VK.com's market platform by parsing, storing, processing and delivering data and thereby providing better performance of my ads.  
+MP_helper is designed and created for my personal use, it helps me run ads for my workshop via VK.com's market platform by parsing, storing, processing and delivering historical data and thereby providing better performance of my ads.  
 
 ## stack
 - [FastApi]  
 - [SQLAlchemy]  
 - [PostgreSQL]  
+- shoutout to [requests] library  
+- special thanks to [Jinja2Templates]  
+- People's Choice Award goes to [regular expressions]  
 
 ## preparing
 - go to the project folder in terminal and run:  
@@ -45,3 +48,6 @@ MP_helper is designed and created for my personal use, it helps me run ads for m
    [FastApi]: <https://fastapi.tiangolo.com/>
    [SQLAlchemy]: <https://www.sqlalchemy.org/>
    [PostgreSQL]: <https://www.postgresql.org/>
+   [requests]: <https://requests.readthedocs.io>
+   [regular expressions]: <https://docs.python.org/3/library/re.html>
+   [Jinja2Templates]: <https://jinja.palletsprojects.com/en/>

@@ -7,10 +7,11 @@
     <div class="mx-4">
 
         <form action="/update_stats" method="post">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">update stats</button>
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">
+                update stats (including active & pending)</button>
         </form>
         <form action="/load_stats" method="post">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">load stats</button>
+            <button class="px-3 py-1 bg-blue-500 text-white ml-4">load historical stats</button>
         </form>
         <form action="/pending" method="get">
             <button class="px-3 py-1 bg-blue-500 text-white ml-4">show pending total</button>
@@ -118,6 +119,7 @@
                     <th class="border">Clicks</th>
                     <th class="border">Reach</th>
                     <th class="border">Rub/Click</th>
+                    <th class="border">CTR</th>
                     <th class="border">Reach coeff</th>
                 </tr>
             </thead>
@@ -130,8 +132,10 @@
                     <td class="border">{{ item.reach }}</td>
                     {% if item.clicks %}
                         <td class="border">{{ item.cost // item.clicks }}</td>
+                        <td class="border">{{ (item.clicks / item.reach * 100)|round(2) }}</td>
                     {% else %}
                         <td class="border">{{ item.cost }}</td>
+                        <td class="border">0</td>
                     {% endif %}
                     <td class="border">{{ item.cost * 1000 // item.reach }}</td>
                 </tr>
