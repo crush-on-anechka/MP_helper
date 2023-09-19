@@ -1,6 +1,6 @@
 # MP_helper
 
-MP_helper is designed and created for my personal use, it helps me run ads for my workshop via VK.com's market platform by parsing, storing, processing and delivering historical data and thereby providing better performance of my ads.  
+MP_helper is designed and created for my personal use (although every user would kill for it!), it helps me run ads for my workshop via VK.com's market platform by parsing, storing, processing and delivering historical data and thereby providing better performance of my ads.  
 
 ## stack
 - [FastApi]  
@@ -13,7 +13,7 @@ MP_helper is designed and created for my personal use, it helps me run ads for m
 ## preparing
 - go to the project folder in terminal and run:  
         - `python3 -m venv venv` to set up your virtual environment  
-        - `. venb/bin/activate` to activate it  
+        - `. venv/bin/activate` to activate it  
         - `pip install -r requirements.txt` to install necessary libraries  
 - create a `.env file` and fill it up using the following schema:  
         - DB_NAME=database_name  
@@ -34,8 +34,8 @@ MP_helper is designed and created for my personal use, it helps me run ads for m
 
 ## using
 - go to https://vk.com/adsmarket?act=export_stats, open your dev tools (cmd+option+U), press GET DATA blue button, find most recent 'adsmarket' line in sources tab, click right button and COPY AS CURL  
-- go to http://127.0.0.1:8000, paste the copied data into 'put your request as curl here' form and press 'update cookies'. You will have to update cookies once a day  
-- now you can load your stats. This may take some time (±2 minutes). This will initially fill up the database, you don't need to do it every time you use the app, only unless you killed the db volume  
+- go to http://127.0.0.1:8000, paste the copied data into 'put your request as curl here' form and press 'update cookies'. You will have to update cookies at least once a day  
+- now you can load your stats. This may take some time (up to several minutes) depending on the amount of historical data. This will initially fill up the database, you don't need to do it every time you use the app, only unless you killed the db volume  
 - press 'update stats' to obtain active placements. Use it whenever you feel like it's time to refresh data  
 - now you can place your ads. Once you get the selection of groups, copy the url (as you would normally do - via the address bar), paste it into 'put your selection link here' form in the app and press 'analyze'  
 
@@ -44,6 +44,8 @@ MP_helper is designed and created for my personal use, it helps me run ads for m
     see the amount of money blocked for pending ads divided up by days
 - ##### show performance
     see performance stats for each of the ad creatives for specified time frames
+- ##### clear cache
+    groups that were present in previous selections become marked green (cached), which indicates that you have approved them. Once the selection is placed you want to clear cache using corresponding button
 
    [FastApi]: <https://fastapi.tiangolo.com/>
    [SQLAlchemy]: <https://www.sqlalchemy.org/>

@@ -5,35 +5,41 @@
 </head>
 <body>
     <div class="mx-4">
+        <div style="width: 30%; float:left">
+            <form action="/update_stats" method="post">
+                <br>
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4">
+                    update stats (including active & pending)</button>
+            </form>
+            <form action="/load_stats" method="post">
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4">load historical stats</button>
+            </form>
+            <form action="/pending" method="get">
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4">show pending total</button>
+            </form>
+            <form action="/clear_cache" method="post">
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4">clear cache</button>
+            </form>
+        </div>
+        <div style="width: 70%; float:right">
+            <form action="/performance" method="post">
+                enter start date in 'ddmmyy' format:<br>
+                <input class="bg-blue-100" name="start" />
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4" >show performance</button>
+            </form>
 
-        <form action="/update_stats" method="post">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">
-                update stats (including active & pending)</button>
-        </form>
-        <form action="/load_stats" method="post">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">load historical stats</button>
-        </form>
-        <form action="/pending" method="get">
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4">show pending total</button>
-        </form>
+            <form action="/update_cookies" method="post">
+                put your request as curl here:<br>
+                <input class="bg-blue-100" name="curl" />
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4" >update cookies</button>
+            </form>
 
-        <form action="/performance" method="post">
-            enter start date in 'ddmmyy' format:<br>
-            <input class="bg-blue-100" name="start" />
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >show performance</button>
-        </form>
-
-        <form action="/update_cookies" method="post">
-            put your request as curl here:<br>
-            <input class="bg-blue-100" name="curl" />
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >update cookies</button>
-        </form>
-
-        <form action="/analyze" method="post">
-            put your selection link here:<br>
-            <input class="bg-blue-100" name="url" />
-            <button class="px-3 py-1 bg-blue-500 text-white ml-4" >analyze</button>
-        </form>
+            <form action="/analyze" method="post">
+                put your selection link here:<br>
+                <input class="bg-blue-100" name="url" />
+                <button class="px-3 py-1 bg-blue-500 text-white ml-4" >analyze</button>
+            </form>
+        </div>
 
         <div class="mx-4">
             {{ message }}
@@ -59,7 +65,11 @@
             </thead>
             <tbody class="text-center text-sm">
                 {% for group_id, group_data in context.items() %}
-                <tr>
+                {% if group_id in cache %}
+                <tr style="background-color:#c2d7c0">
+                {% else %}
+                <tr>    
+                {% endif %}
                     <td class="border">{{ group_id }}</td>
                     <td class="border">{{ group_data.group_name[:20] }}</td>
                     <td class="border">{{ group_data.reach }}</td>

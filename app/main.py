@@ -13,6 +13,7 @@ from utils import (extract_cookies, get_context, get_group_instances,
                    render_template, write_to_db)
 
 app = FastAPI()
+cache = []
 
 
 @app.get('/', response_class=HTMLResponse)
@@ -77,7 +78,6 @@ def load_stats_handler(request: Request, db: Session = Depends(get_db)):
 @app.post('/analyze', response_class=HTMLResponse)
 def analyze_handler(request: Request, url: Optional[str] = Form(None),
                     db: Session = Depends(get_db)):
-
     if not url:
         return render_template(
             request=request, message=MESSAGES['failed_no_url'])
@@ -109,14 +109,17 @@ def analyze_handler(request: Request, url: Optional[str] = Form(None),
 
     context = dict(sorted(context.items()))
 
-    return render_template(
-        request=request, context=context, active=active_items)
+    template = render_template(
+        request=request, context=context, active=active_items, cache=cache)
+
+    cache.extend(selection.keys())
+
+    return template
 
 
 @app.post('/update_cookies')
 def update_cookies_handler(request: Request, curl: str = Form(None),
                            db: Session = Depends(get_db)):
-
     if not curl:
         return render_template(
             request=request, message=MESSAGES['failed_no_curl'])
@@ -163,7 +166,6 @@ def pending_total_handler(request: Request, db: Session = Depends(get_db)):
 @app.post('/performance')
 def performance_handler(request: Request, start: str = Form(None),
                         db: Session = Depends(get_db)):
-
     try:
         dt = datetime.strptime(start, "%d%m%y").strftime('%d %B %y')
     except (TypeError, ValueError):
@@ -183,3 +185,12 @@ def performance_handler(request: Request, start: str = Form(None),
 
     return render_template(request=request, message=message,
                            performance=performance)
+
+
+@app.post('/clear_cache')
+def clear_cache_handler(request: Request):
+    global cache
+    cache = []
+
+    return render_template(
+        request=request, message=MESSAGES['success_cache'])

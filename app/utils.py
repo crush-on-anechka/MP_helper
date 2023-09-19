@@ -72,8 +72,10 @@ def render_template(request: Request,
                     context: Optional[dict] = None,
                     pending: Optional[dict] = None,
                     performance: Optional[list] = None,
+                    cache: Optional[list[int]] = None,
                     active: Optional[dict] = None) -> None:
     return templates.TemplateResponse(
         'index.html',
         {'request': request, 'context': context, 'pending': pending,
-         'performance': performance, 'active': active, 'message': message})
+         'performance': performance, 'active': active, 'message': message,
+         'cache': cache})
