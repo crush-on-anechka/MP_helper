@@ -45,7 +45,7 @@ MP_helper is designed and created for my personal use (although every user would
 - ##### show performance
     see performance stats for each of the ad creatives for specified time frames
 - ##### clear cache
-    groups that were present in previous selections become marked green (cached), which indicates that you have approved them. Once the selection is placed you want to clear cache using corresponding button
+    during a placement session groups that were present in previous selections become marked green (cached), which indicates that you have approved them. Use 'clear cache' between your placement sessions if there are several, it marks all previously seen groups red (skipped) and clears cache
 
    [FastApi]: <https://fastapi.tiangolo.com/>
    [SQLAlchemy]: <https://www.sqlalchemy.org/>

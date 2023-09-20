@@ -13,7 +13,8 @@ from utils import (extract_cookies, get_context, get_group_instances,
                    render_template, write_to_db)
 
 app = FastAPI()
-cache = []
+cache = set()
+skipped = set()
 
 
 @app.get('/', response_class=HTMLResponse)
@@ -109,10 +110,10 @@ def analyze_handler(request: Request, url: Optional[str] = Form(None),
 
     context = dict(sorted(context.items()))
 
-    template = render_template(
-        request=request, context=context, active=active_items, cache=cache)
+    template = render_template(request=request, context=context, cache=cache,
+                               active=active_items, skipped=skipped)
 
-    cache.extend(selection.keys())
+    cache.update(selection.keys())
 
     return template
 
@@ -190,7 +191,9 @@ def performance_handler(request: Request, start: str = Form(None),
 @app.post('/clear_cache')
 def clear_cache_handler(request: Request):
     global cache
-    cache = []
+    global skipped
+    skipped.update(cache)
+    cache = set()
 
     return render_template(
         request=request, message=MESSAGES['success_cache'])

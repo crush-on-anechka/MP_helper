@@ -12,7 +12,7 @@ MESSAGES = {
     'success_stats_update': 'stats are up to date',
     'success_stats_load': 'stats successfully loaded',
     'success_cookies': 'cookies are up to date',
-    'success_cache': 'cache has been cleared',
+    'success_cache': 'cache has been cleared, "skipped" list updated',
     'failed_init': 'task failed: did you forget to load initial data?',
     'failed_cookies': 'task failed: did you forget to update cookies?',
     'failed_no_url': 'task failed: enter url',
