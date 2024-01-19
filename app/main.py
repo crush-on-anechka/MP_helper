@@ -56,11 +56,16 @@ def update_stats_handler(request: Request, db: Session = Depends(get_db)):
 @app.post('/load_stats')
 def load_stats_handler(request: Request, db: Session = Depends(get_db)):
     stats_instances, groups = [], {}
-    current_year = date.today().year
 
-    for year in range(START_YEAR, current_year + 1, 2):
-        start_date = f'{year}0101'
-        end_date = f'{year + 2}0101'
+    # TODO изменить логику загрузки исторических данных: нужно прописать
+    # цикл, который будет перебирать года и чанки по 2-3 месяца, например
+    # 20230101 - 20230331, добавить вывод в консоль. Удаление StatsModel
+    # не нужно, но нужно не запускать команду, если в таблице есть данные
+    current_year = date.today().year
+    for year in range(1):
+        # year - month - day
+        start_date = f'20150101'
+        end_date = f'20151231'
         cur_stats, cur_groups = get_stats(db, start_date, end_date)
         if not cur_stats:
             return render_template(
@@ -69,7 +74,7 @@ def load_stats_handler(request: Request, db: Session = Depends(get_db)):
         groups.update(cur_groups)
 
     group_instances = get_group_instances(groups)
-    db.query(StatsModel).delete()
+    # db.query(StatsModel).delete()
     write_to_db(db=db, stats=stats_instances, groups=group_instances)
 
     return render_template(

@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 load_dotenv()
 
-START_YEAR = 2015
+START_YEAR = 2022
 MAX_PLACEMENTS = 5
 
 MESSAGES = {

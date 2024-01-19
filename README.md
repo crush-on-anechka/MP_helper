@@ -16,11 +16,13 @@ MP_helper is designed and created for my personal use (although every user would
         - `. venv/bin/activate` to activate it  
         - `pip install -r requirements.txt` to install necessary libraries  
 - create a `.env file` and fill it up using the following schema:  
-        - DB_NAME=database_name  
-        - POSTGRES_USER=user  
-        - POSTGRES_PASSWORD=password  
-        - UNION_ID=123456789 (your VK user id)  
-        - DATABASE_URL=postgresql://{user}:{password}@0.0.0.0:{port}/{database_name}  
+        - DB_NAME=your_db_name
+        - POSTGRES_USER=your_db_username
+        - POSTGRES_PASSWORD=your_db_password
+        - HOST=0.0.0.0
+        - PORT=any_free_port
+        - UNION_ID=your_vk_user_union_id
+        - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${HOST}:${PORT}/${DB_NAME}
 
 
 ## starting

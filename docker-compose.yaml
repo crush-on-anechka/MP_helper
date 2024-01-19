@@ -1,10 +1,15 @@
 version: '3.3'
 services:
   db:
-    container_name: "mp_db"
-    image: postgres:13.0-alpine
+    container_name: "mp_helper_db"
+    image: postgres:16-alpine
     restart: always
     env_file:
       - ./.env
     ports:
-      - "5432:5432"
+      - "${PORT}:5432"
+    volumes:
+      - mp_helper_volume:/home
+
+volumes:
+  mp_helper_volume:
