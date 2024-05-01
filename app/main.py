@@ -55,26 +55,30 @@ def update_stats_handler(request: Request, db: Session = Depends(get_db)):
 
 @app.post('/load_stats')
 def load_stats_handler(request: Request, db: Session = Depends(get_db)):
-    stats_instances, groups = [], {}
+    not_empty = db.query(StatsModel).count() != 0
+    if not_empty:
+        return render_template(
+            request=request, message=MESSAGES['failed_stats_load'])
 
-    # TODO изменить логику загрузки исторических данных: нужно прописать
-    # цикл, который будет перебирать года и чанки по 2-3 месяца, например
-    # 20230101 - 20230331, добавить вывод в консоль. Удаление StatsModel
-    # не нужно, но нужно не запускать команду, если в таблице есть данные
+    stats_instances, groups = [], {}
     current_year = date.today().year
-    for year in range(1):
-        # year - month - day
-        start_date = f'20150101'
-        end_date = f'20151231'
-        cur_stats, cur_groups = get_stats(db, start_date, end_date)
-        if not cur_stats:
-            return render_template(
-                request=request, message=MESSAGES['failed_cookies'])
-        stats_instances.extend(cur_stats)
-        groups.update(cur_groups)
+    chunks = [
+        ('0101', '0331'), ('0401', '0630'), ('0701', '0930'), ('1001', '1231')
+    ]
+    for year in range(START_YEAR, current_year + 1):
+        for chunk in chunks:
+            # year - month - day
+            start_date = f'{year}{chunk[0]}'
+            end_date = f'{year}{chunk[1]}'
+            cur_stats, cur_groups = get_stats(db, start_date, end_date)
+            if cur_stats is None:
+                return render_template(
+                    request=request, message=MESSAGES['failed_cookies'])
+            stats_instances.extend(cur_stats)
+            groups.update(cur_groups)
+            print(f'{year}{chunk[0]} - {year}{chunk[1]} processed')
 
     group_instances = get_group_instances(groups)
-    # db.query(StatsModel).delete()
     write_to_db(db=db, stats=stats_instances, groups=group_instances)
 
     return render_template(

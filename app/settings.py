@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 load_dotenv()
 
-START_YEAR = 2022
+START_YEAR = 2015
 MAX_PLACEMENTS = 5
 
 MESSAGES = {
@@ -13,6 +13,7 @@ MESSAGES = {
     'success_stats_load': 'stats successfully loaded',
     'success_cookies': 'cookies are up to date',
     'success_cache': 'cache has been cleared, "skipped" list updated',
+    'failed_stats_load': 'stats not loaded, table contains data',
     'failed_init': 'task failed: did you forget to load initial data?',
     'failed_cookies': 'task failed: did you forget to update cookies?',
     'failed_no_url': 'task failed: enter url',

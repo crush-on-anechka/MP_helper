@@ -21,13 +21,15 @@ def get_stats(db: Session, start_date: date,
 
     response = requests.post(url=URL, params=PARAMS, cookies=cookies,
                              headers=HEADERS, data=data)
-
     try:
         decoded_response = response.text.encode('latin1').decode('cp1251')
     except UnicodeEncodeError:
         raise
 
     split_response = decoded_response.split('\n')
+
+    if 'payload' in split_response[0]:
+        return None, None
 
     objects, groups = [], {}
 
